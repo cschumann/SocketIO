@@ -5,10 +5,10 @@ using Newtonsoft.Json.Serialization;
 
 namespace API.Controllers
 {
-    public class MessagesController : ApiController
+    public class StatusController : ApiController
     {
         [HttpPost]
-        public void Post(Message message)
+        public void Index(Status status)
         {
             var formatters = GlobalConfiguration.Configuration.Formatters;
             var jsonFormatter = formatters.JsonFormatter;
@@ -19,8 +19,7 @@ namespace API.Controllers
 
 
             var socket = SocketHelper.GetSocket();
-            socket.Emit("chat message", JsonConvert.SerializeObject(message, settings));
+            socket.Emit("status", JsonConvert.SerializeObject(status, settings));
         }
-
     }
 }

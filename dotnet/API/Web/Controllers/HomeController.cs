@@ -10,9 +10,9 @@ namespace Web.Controllers
             return View();
         }
 
-        public ActionResult Chat(string username)
+        public ActionResult Chat(string username, string chattingTo)
         {
-            var model = new ChatViewModel { Username = username };
+            var model = new ChatViewModel { Username = username, ChattingTo = chattingTo};
             return View(model);
         }
 

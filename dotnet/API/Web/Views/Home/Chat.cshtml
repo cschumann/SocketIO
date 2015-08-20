@@ -56,25 +56,44 @@
                 }
     </style>
 </head>
-<body>
-    <ul id="messages"></ul>
-    <form action="">
-        <input id="m" autocomplete="off" /><button>Send</button>
-    </form>
-    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
-    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
-    <script>
-        var socket = io("http://localhost:3000");
-        socket.emit('login', '@Model.Username');
-        $('form').submit(function () {
-            socket.emit('chat message', $('#m').val());
-            $('#m').val('');
-            return false;
-        });
-        socket.on('chat message', function (msg) {
-            var message = JSON.parse(msg);
-            $('#messages').append($('<li>').text(message.body));
-        });
-    </script>
-</body>
+    <body>
+        <span id="status"></span>
+        <ul id="messages"></ul>
+        <form>
+            <input id="m" autocomplete="off" /><button id="send" type="button">Send</button>
+        </form>
+        <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+        <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+        <script>
+            var socket = io("http://localhost:3000");
+            var chattingTo = '@Model.ChattingTo';
+            var username = '@Model.Username';
+
+            socket.emit('login', '@Model.Username');
+
+            $('#send').on('click',function () {
+                var message = { 'recipientName': chattingTo, 'body': username + ': ' + $('#m').val() };
+                socket.emit('chat message', JSON.stringify(message));
+                $('#messages').append($('<li>').text(message.body));
+                $('#m').val('');
+            });
+
+            socket.on('chat message', function (msg) {
+                var message = JSON.parse(msg);
+                $('#messages').append($('<li>').text(message.body));
+                $('#status').text('');
+            });
+
+            socket.on('status', function (msg) {
+                var status = JSON.parse(msg);
+                $('#status').text(status.info);
+            });
+
+            $('#m').on('keypress', function () {
+                var message = { 'recipientName': chattingTo, 'info': username + ' is typing' };
+                socket.emit('status', JSON.stringify(message));
+            });
+
+        </script>
+    </body>
 </html>
